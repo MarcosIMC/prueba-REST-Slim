@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="2b3a9b41-f241-4242-b5e1-3b79da1d18d0" name="xampp" url="http://localhost/slim">
+        <fileTransfer port="0" mountedRoot="D:\Programas\Xampp\htdocs\slim" accessType="MOUNT" />
+      </webServer>
+    </option>
+  </component>
+</project>
