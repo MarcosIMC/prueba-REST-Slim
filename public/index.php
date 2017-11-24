@@ -36,6 +36,8 @@ require '../src/rutas/admin.php';*/
 //Usuarios
 $app->get('/api/usuarios/getAllUsers', function (Request $request, Response $response){
 
+
+
     $query = "SELECT * FROM usuarios";
 
     $db = new db();
@@ -43,30 +45,28 @@ $app->get('/api/usuarios/getAllUsers', function (Request $request, Response $res
     //conexin
     $db = $db->conectar();
 
-    $consulta = $db->query($query);
+    $stmt = $db->prepare($query);
+    $stmt->execute();
 
-    $usuarios = $consulta->fetch_all();
+    $userData = array();
 
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+        $userData['AllUsers'][] = $row;
+    }
+
+    echo json_encode($userData);
+    //var_dump($userData);die();
     $db = null;
-
-    //Exportar y mostrar JSON
-    echo json_encode($usuarios);
-
-    /*try{
-
-    }catch (){
-
-    }*/
 
 });
 
 $app->post('/api/usuarios/addUser', function (Request $request, Response $response){
 
-    $dni = $request->getParam('dni');
-    $nombre = $request->getParam('nombre');
-    $apellidos = $request->getParam('apellidos');
-    $email = $request->getParam('email');
-    $dniAdmin = $request->getParam('dniAdmin');
+    $dni = $request->getParam('Dni');
+    $nombre = $request->getParam('Nombre');
+    $apellidos = $request->getParam('Apellidos');
+    $email = $request->getParam('Email');
+    $dniAdmin = $request->getParam('DniAdmin');
     $role = 'user';
 
     $consulta = "INSERT INTO usuarios (dni, nombre, apellidos, email, dniUserAdmin, role) VALUES
@@ -97,25 +97,41 @@ $app->put('/api/usuarios/updateUser', function (Request $request, Response $resp
 
 //Admin
 
-$app->get('/api/admin/login/{email}', function (Request $request, Response $response){
+$app->get('/api/admin/login', function (Request $request, Response $response){
 
-    $email = $request->getAttribute('email');
-    //$pass = $request->getAttribute('pass');
+    $email = $_REQUEST['email'];
+    $pass = $_REQUEST['pass'];
 
-    $query = "SELECT * FROM admins WHERE email = '$email' ";
+    if ($email=="" || $pass==""){
+        return null;
+    }else{
+        $query = "SELECT * FROM admins WHERE email = '$email' AND pass = '$pass' ";
 
-    $db = new db();
+        $db = new db();
 
-    $db = $db->conectar();
+        $db = $db->conectar();
 
-    $resultado = $db->query($query);
+        $stmt = $db->prepare($query);
+        $stmt->execute();
 
-    $admin = $resultado->fetch_all();
+        if ($stmt->rowCount()>0){
+            $userAdmin = array();
 
-    $db = null;
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)){
+                $userAdmin['admin'][] = $row;
+            }
 
-    echo json_encode($admin);
+            echo json_encode($userAdmin);
 
+        }else{
+            return null;
+        }
+        $db = null;
+
+
+    }
+
+    //var_dump($userAdmin);die();
 });
 
 $app->run();
